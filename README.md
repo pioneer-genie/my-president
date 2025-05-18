@@ -37,6 +37,6 @@ http://localhost:8000
 
 GitHub Actions를 통해 자동으로 배포됩니다. main 브랜치에 push하면 자동으로 gh-pages 브랜치에 배포됩니다.
 
-## 라이선스
+## 난독화
 
-MIT License 
+npx terser src/js/main.js -c -m -o src/js/main.min.js
