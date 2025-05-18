@@ -308,7 +308,7 @@ function showResults() {
     
     // 결과 표시
     container.innerHTML = `
-        <div class="text-center">
+        <div class="text-center px-2 sm:px-4">
             <h2 class="text-2xl font-bold mb-4">결과</h2>
             ${winner === 'none' ? 
                 '<p class="text-xl mb-6">마음에 드는 공약이 없었습니다.</p>' :
@@ -318,7 +318,7 @@ function showResults() {
                     <img 
                         src="${winner === '이재명' ? 'no1.jpg' : winner === '김문수' ? 'no2.jpg' : 'no4.jpg'}" 
                         alt="${winner} 후보 포스터"
-                        class="mx-auto max-w-sm rounded-lg shadow-lg"
+                        class="mx-auto w-full max-w-[280px] sm:max-w-sm rounded-lg shadow-lg"
                     >
                 </div>`
             }
@@ -330,12 +330,20 @@ function showResults() {
                 `).join('')}
             </div>
             <div class="space-y-4">
-                <button 
-                    class="bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold"
-                    onclick="window.shareResult()"
-                >
-                    결과 공유하기
-                </button>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button 
+                        class="bg-yellow-400 text-black px-6 py-3 rounded-full font-semibold hover:bg-yellow-500 transition-colors"
+                        onclick="window.shareResult()"
+                    >
+                        결과 공유하기
+                    </button>
+                    <button 
+                        class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 transition-colors"
+                        onclick="window.restartSurvey()"
+                    >
+                        다시하기
+                    </button>
+                </div>
                 <div class="mt-4">
                     <p class="text-sm text-gray-600 mb-2">또는 아래 링크를 공유하세요:</p>
                     <div class="relative">
@@ -362,13 +370,13 @@ function showResults() {
             <!-- 카테고리별 선택 내역 테이블 -->
             <div class="mt-12">
                 <h3 class="text-lg font-semibold mb-4">카테고리별 공약 비교</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto -mx-2 sm:mx-0">
                     <table class="min-w-full bg-white border border-gray-200 rounded-lg">
                         <thead>
                             <tr class="bg-gray-50">
-                                <th class="px-6 py-3 border-b text-center text-sm font-semibold text-gray-600">카테고리</th>
+                                <th class="px-2 sm:px-4 py-2 sm:py-3 border-b text-center text-xs sm:text-sm font-semibold text-gray-600">카테고리</th>
                                 ${candidateOrder.map(candidate => `
-                                    <th class="px-6 py-3 border-b text-center text-sm font-semibold text-gray-600">${candidate}</th>
+                                    <th class="px-2 sm:px-4 py-2 sm:py-3 border-b text-center text-xs sm:text-sm font-semibold text-gray-600">${candidate}</th>
                                 `).join('')}
                             </tr>
                         </thead>
@@ -377,14 +385,14 @@ function showResults() {
                                 const answer = answers[index];
                                 return `
                                     <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 border-r text-center">${question.topic}</td>
+                                        <td class="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm font-medium text-gray-900 border-r text-center">${question.topic}</td>
                                         ${candidateOrder.map(candidate => {
                                             const choice = question.choices.find(c => c.candidate === candidate);
                                             const isSelected = answer.candidate === candidate;
                                             const hasPromise = choice && choice.text;
                                             return `
-                                                <td class="px-6 py-4 text-sm ${hasPromise ? 'text-gray-900' : 'text-gray-400 bg-gray-50'} ${isSelected ? 'bg-green-50' : ''} text-center">
-                                                    <div class="max-w-md mx-auto">
+                                                <td class="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm ${hasPromise ? 'text-gray-900' : 'text-gray-400 bg-gray-50'} ${isSelected ? 'bg-green-50' : ''} text-center">
+                                                    <div class="max-w-[120px] sm:max-w-md mx-auto">
                                                         ${hasPromise ? choice.text : '공약 정보 없음'}
                                                     </div>
                                                 </td>
@@ -467,4 +475,14 @@ window.copyToClipboard = function(text) {
         // 임시 엘리먼트 제거
         document.body.removeChild(textarea);
     }
+};
+
+// 다시하기 함수 추가
+window.restartSurvey = function() {
+    // 로컬 스토리지 초기화
+    localStorage.removeItem('surveyAnswers');
+    // 현재 질문 초기화
+    currentQuestion = 0;
+    // 첫 질문 렌더링
+    renderQuestion();
 }; 
