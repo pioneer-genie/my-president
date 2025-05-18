@@ -305,30 +305,45 @@ function showResults() {
     // 결과 암호화
     const encryptedResult = resultCipher.encrypt(resultData);
     const resultUrl = `${window.location.origin}${window.location.pathname}?r=${encryptedResult}`;
+
+    // 후보별 당 색상 정의
+    const partyColors = {
+        '이재명': '#008CCD',  // 더불어민주당
+        '김문수': '#D22739',  // 국민의힘
+        '이준석': '#F47923'   // 개혁신당
+    };
     
     // 결과 표시
     container.innerHTML = `
-        <div class="text-center px-2 sm:px-4">
+        <div class="text-center px-2 sm:px-4 py-8 rounded-lg" style="background-color: ${winner !== 'none' ? partyColors[winner] + '10' : 'white'}">
             <h2 class="text-2xl font-bold mb-4">결과</h2>
             ${winner === 'none' ? 
                 '<p class="text-xl mb-6">마음에 드는 공약이 없었습니다.</p>' :
-                `<p class="text-xl mb-6">나와 가장 맞는 후보는 ${winner}입니다!</p>
-                <!-- 후보자 포스터 표시 -->
-                <div class="mb-8">
-                    <img 
-                        src="${winner === '이재명' ? 'no1.jpg' : winner === '김문수' ? 'no2.jpg' : 'no4.jpg'}" 
-                        alt="${winner} 후보 포스터"
-                        class="mx-auto w-full max-w-[280px] sm:max-w-sm rounded-lg shadow-lg"
-                    >
+                `<div class="mb-8">
+                    <p class="text-xl mb-6">나와 가장 맞는 후보는 <span class="font-bold" style="color: ${partyColors[winner]}">${winner}</span>입니다!</p>
+                    <!-- 후보자 포스터 표시 -->
+                    <div>
+                        <img 
+                            src="${winner === '이재명' ? 'no1.jpg' : winner === '김문수' ? 'no2.jpg' : 'no4.jpg'}" 
+                            alt="${winner} 후보 포스터"
+                            class="mx-auto w-full max-w-[280px] sm:max-w-sm rounded-lg shadow-lg"
+                        >
+                    </div>
                 </div>`
             }
 
             <div class="mb-8">
-                <h3 class="text-lg font-semibold mb-2">상세 점수</h3>
-                ${candidateOrder.map(candidate => `
-                    <p class="mb-1">${candidate}: ${scores[candidate] || 0}점</p>
-                `).join('')}
+                <h3 class="text-lg font-semibold mb-4">상세 점수</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    ${candidateOrder.map(candidate => `
+                        <div class="p-4 rounded-lg border" style="border-color: ${partyColors[candidate]}40; background: ${partyColors[candidate]}10">
+                            <p class="font-semibold mb-2" style="color: ${partyColors[candidate]}">${candidate}</p>
+                            <p class="text-2xl font-bold" style="color: ${partyColors[candidate]}">${scores[candidate] || 0}점</p>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
+
             <div class="space-y-4">
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
@@ -376,7 +391,7 @@ function showResults() {
                             <tr class="bg-gray-50">
                                 <th class="px-2 sm:px-4 py-2 sm:py-3 border-b text-center text-xs sm:text-sm font-semibold text-gray-600">카테고리</th>
                                 ${candidateOrder.map(candidate => `
-                                    <th class="px-2 sm:px-4 py-2 sm:py-3 border-b text-center text-xs sm:text-sm font-semibold text-gray-600">${candidate}</th>
+                                    <th class="px-2 sm:px-4 py-2 sm:py-3 border-b text-center text-xs sm:text-sm font-semibold" style="color: ${partyColors[candidate]}">${candidate}</th>
                                 `).join('')}
                             </tr>
                         </thead>
@@ -391,7 +406,7 @@ function showResults() {
                                             const isSelected = answer.candidate === candidate;
                                             const hasPromise = choice && choice.text;
                                             return `
-                                                <td class="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm ${hasPromise ? 'text-gray-900' : 'text-gray-400 bg-gray-50'} ${isSelected ? 'bg-green-50' : ''} text-center">
+                                                <td class="px-2 sm:px-4 py-2 sm:py-4 text-xs sm:text-sm ${hasPromise ? 'text-gray-900' : 'text-gray-400 bg-gray-50'} ${isSelected ? 'bg-green-50' : ''} text-center" style="${isSelected ? `border: 2px solid ${partyColors[candidate]}` : ''}">
                                                     <div class="max-w-[120px] sm:max-w-md mx-auto">
                                                         ${hasPromise ? choice.text : '공약 정보 없음'}
                                                     </div>
@@ -483,6 +498,8 @@ window.restartSurvey = function() {
     localStorage.removeItem('surveyAnswers');
     // 현재 질문 초기화
     currentQuestion = 0;
+    // URL 파라미터 제거
+    window.history.replaceState({}, document.title, window.location.pathname);
     // 첫 질문 렌더링
     renderQuestion();
 }; 
