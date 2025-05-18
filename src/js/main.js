@@ -288,8 +288,14 @@ function showResults() {
     });
     
     // 가장 높은 점수를 받은 후보 찾기
-    const winner = Object.entries(scores)
-        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'none';
+    const sortedScores = Object.entries(scores)
+        .sort((a, b) => b[1] - a[1]);
+    
+    const maxScore = sortedScores[0]?.[1] || 0;
+    const winners = sortedScores
+        .filter(([_, score]) => score === maxScore)
+        .map(([candidate]) => candidate)
+        .sort((a, b) => candidateOrder.indexOf(a) - candidateOrder.indexOf(b)); // 후보자 순서대로 정렬
     
     const container = document.getElementById('survey-container');
     if (!container) {
@@ -315,19 +321,28 @@ function showResults() {
     
     // 결과 표시
     container.innerHTML = `
-        <div class="text-center px-2 sm:px-4 py-8 rounded-lg" style="background-color: ${winner !== 'none' ? partyColors[winner] + '10' : 'white'}">
+        <div class="text-center px-2 sm:px-4 py-8 rounded-lg" style="background-color: ${winners.length === 1 ? partyColors[winners[0]] + '10' : '#f8f9fa'}">
             <h2 class="text-2xl font-bold mb-4">결과</h2>
-            ${winner === 'none' ? 
+            ${winners.length === 0 ? 
                 '<p class="text-xl mb-6">마음에 드는 공약이 없었습니다.</p>' :
                 `<div class="mb-8">
-                    <p class="text-xl mb-6">나와 가장 맞는 후보는 <span class="font-bold" style="color: ${partyColors[winner]}">${winner}</span>입니다!</p>
+                    <p class="text-xl mb-6">
+                        ${winners.length === 1 ? 
+                            `나와 가장 맞는 후보는 <span class="font-bold" style="color: ${partyColors[winners[0]]}">${winners[0]}</span>입니다!` :
+                            `나와 가장 맞는 후보들은 <span class="font-bold">${winners.map(candidate => `<span style="color: ${partyColors[candidate]}">${candidate}</span>`).join(', ')}</span>입니다!<br><span class="text-lg text-gray-600">박빙이네요! 동점입니다.</span>`
+                        }
+                    </p>
                     <!-- 후보자 포스터 표시 -->
-                    <div>
-                        <img 
-                            src="${winner === '이재명' ? 'no1.jpg' : winner === '김문수' ? 'no2.jpg' : 'no4.jpg'}" 
-                            alt="${winner} 후보 포스터"
-                            class="mx-auto w-full max-w-[280px] sm:max-w-sm rounded-lg shadow-lg"
-                        >
+                    <div class="flex justify-center gap-4">
+                        ${winners.map(candidate => `
+                            <div class="w-1/${winners.length}">
+                                <img 
+                                    src="${candidate === '이재명' ? 'no1.jpg' : candidate === '김문수' ? 'no2.jpg' : 'no4.jpg'}" 
+                                    alt="${candidate} 후보 포스터"
+                                    class="mx-auto w-full max-w-[280px] sm:max-w-sm rounded-lg shadow-lg"
+                                >
+                            </div>
+                        `).join('')}
                     </div>
                 </div>`
             }
