@@ -505,6 +505,14 @@ window.shareResult = async function() {
 
 // 클립보드에 복사하는 함수
 window.copyToClipboard = function(text) {
+    // GA 이벤트 추적 추가 (결과 파라미터 포함)
+    const resultParam = text.split('r=')[1];
+    gtag('event', 'share_result', {
+        'event_category': 'engagement',
+        'event_label': 'copy_link_click',
+        'result_param': resultParam || 'none'
+    });
+
     // 임시 textarea 엘리먼트 생성
     const textarea = document.createElement('textarea');
     textarea.value = text;
