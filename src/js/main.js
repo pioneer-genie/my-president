@@ -132,6 +132,17 @@ window.toggleOriginal = function(topic) {
 
 // 답변을 선택하는 함수
 window.selectAnswer = function(candidate, originalPosition, displayPosition) {
+    // GA 이벤트 추적 추가
+    gtag('event', 'survey_answer', {
+        'event_category': 'survey',
+        'event_label': 'answer_selected',
+        'step': currentQuestion + 1,
+        'total_steps': surveyData.length,
+        'selected_candidate': candidate,
+        'original_position': originalPosition,
+        'display_position': displayPosition
+    });
+
     // 로컬 스토리지에 답변 저장
     const answers = JSON.parse(localStorage.getItem('surveyAnswers') || '[]');
     answers.push({
@@ -238,6 +249,13 @@ async function init() {
         const resultParam = urlParams.get('r'); // 'result' 대신 'r' 사용
         
         if (resultParam) {
+            // GA 이벤트 추적 - 결과 페이지 조회
+            gtag('event', 'survey_result_view', {
+                'event_category': 'survey',
+                'event_label': 'result_page_view',
+                'result_param': resultParam
+            });
+
             // URL에서 결과를 복호화
             const decryptedResult = resultCipher.decrypt(resultParam);
             if (!decryptedResult) {
@@ -258,6 +276,13 @@ async function init() {
             currentQuestion = surveyData.length;
             showResults();
         } else {
+            // GA 이벤트 추적 - 설문 시작
+            gtag('event', 'survey_start', {
+                'event_category': 'survey',
+                'event_label': 'survey_started',
+                'total_steps': surveyData.length
+            });
+
             // 새로운 설문 시작 시 이전 결과 초기화
             localStorage.removeItem('surveyAnswers');
             renderQuestion();
@@ -441,6 +466,17 @@ function showResults() {
 
 // 공유 함수
 window.shareResult = async function() {
+    // 결과 URL에서 result 파라미터 추출
+    const resultUrl = document.querySelector('input[readonly]').value;
+    const resultParam = resultUrl.split('r=')[1];
+
+    // GA 이벤트 추적 추가 (결과 파라미터 포함)
+    gtag('event', 'share_result', {
+        'event_category': 'engagement',
+        'event_label': 'share_button_click',
+        'result_param': resultParam || 'none'
+    });
+
     const shareData = {
         title: '나와 맞는 대선 후보 찾기',
         text: '나와 맞는 대선 후보를 찾아보세요!',
@@ -509,6 +545,17 @@ window.copyToClipboard = function(text) {
 
 // 다시하기 함수 추가
 window.restartSurvey = function() {
+    // 결과 URL에서 result 파라미터 추출
+    const resultUrl = document.querySelector('input[readonly]').value;
+    const resultParam = resultUrl.split('r=')[1];
+
+    // GA 이벤트 추적 추가 (결과 파라미터 포함)
+    gtag('event', 'restart_survey', {
+        'event_category': 'engagement',
+        'event_label': 'retry_button_click',
+        'result_param': resultParam || 'none'
+    });
+
     // 로컬 스토리지 초기화
     localStorage.removeItem('surveyAnswers');
     // 현재 질문 초기화
