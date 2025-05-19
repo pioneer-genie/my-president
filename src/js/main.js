@@ -481,7 +481,7 @@ window.shareResult = async function() {
     const shareData = {
         title: '나와 맞는 대선 후보 찾기',
         text: '나와 맞는 대선 후보를 찾아보세요!',
-        url: window.location.href
+        url: resultUrl  // 현재 URL 대신 결과 URL 사용
     };
 
     try {
