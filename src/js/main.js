@@ -249,13 +249,6 @@ async function init() {
         const resultParam = urlParams.get('r'); // 'result' 대신 'r' 사용
         
         if (resultParam) {
-            // GA 이벤트 추적 - 결과 페이지 조회
-            gtag('event', 'survey_result_view', {
-                'event_category': 'survey',
-                'event_label': 'result_page_view',
-                'result_param': resultParam
-            });
-
             // URL에서 결과를 복호화
             const decryptedResult = resultCipher.decrypt(resultParam);
             if (!decryptedResult) {
@@ -335,6 +328,14 @@ function showResults() {
     
     // 결과 암호화
     const encryptedResult = resultCipher.encrypt(resultData);
+
+    // GA 이벤트 추적 - 결과 페이지 조회
+    gtag('event', 'survey_result_view', {
+        'event_category': 'survey',
+        'event_label': 'result_page_view',
+        'result_param': encryptedResult
+    });
+
     const resultUrl = `${window.location.origin}${window.location.pathname}?r=${encryptedResult}`;
 
     // 후보별 당 색상 정의
